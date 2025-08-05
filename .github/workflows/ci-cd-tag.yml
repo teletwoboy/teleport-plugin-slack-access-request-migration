@@ -6,9 +6,26 @@ on:
       - 'v*'
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    
+    outputs:
+        IMAGE_TAG: ${{ steps.extract_version.outputs.image_tag }}
+
+    steps:
+      - name: Extract version
+        id: extract_version
+        run: |
+          RAW_VERSION="${GITHUB_REF#refs/tags/}"
+          IMAGE_TAG="${RAW_VERSION#v}"
+          echo "RAW_VERSION=$RAW_VERSION" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "Image Tag is $IMAGE_TAG"
+
+
   build:
     runs-on: ubuntu-latest
-
+    needs: setup
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -24,14 +41,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Extract version
-        run: |
-          RAW_VERSION="${GITHUB_REF#refs/tags/}"
-          IMAGE_TAG="${RAW_VERSION#v}"
-          echo "RAW_VERSION=$RAW_VERSION" >> $GITHUB_ENV
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          echo "Image Tag is $IMAGE_TAG"
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -42,11 +51,11 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: docker.io/springboothate/teleport-plugin-slack-access-request-migration:${{ env.IMAGE_TAG }}
+          tags: docker.io/springboothate/teleport-plugin-slack-access-request-migration:${{ needs.setup.outputs.IMAGE_TAG }}
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [setup, build]
 
     steps:
       - name: Checkout deployment repo
@@ -58,7 +67,7 @@ jobs:
 
       - name: Update helm chart
         run: |
-          sed -i "s|imageTag: .*|imageTag: ${{ env.IMAGE_TAG }}|" charts/slack-access-request/values.yaml
+          sed -i "s|imageTag: .*|imageTag: ${{ needs.setup.outputs.IMAGE_TAG }}|" charts/slack-access-request/values.yaml
 
       - name: Commit and push changes
         working-directory: charts
@@ -66,7 +75,7 @@ jobs:
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add .
-          git commit -m "Update migration image tag to ${{ env.IMAGE_TAG }}"
+          git commit -m "Update migration image tag to ${{ needs.setup.outputs.IMAGE_TAG }}"
           git push
 
   notify:
