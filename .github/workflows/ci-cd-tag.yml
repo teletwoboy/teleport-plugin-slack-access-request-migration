@@ -61,21 +61,21 @@ jobs:
       - name: Checkout deployment repo
         uses: actions/checkout@v3
         with:
-          repository: teletwoboy/charts
-          path: charts
+          repository: teletwoboy/teleport-plugin-slack-access-request-helm
+          path: helm
           token: ${{ secrets.ORG_GITHUB_KEY }}
 
       - name: Update helm chart
         run: |
-          sed -i "s|imageTag: .*|imageTag: ${{ needs.setup.outputs.IMAGE_TAG }}|" charts/slack-access-request/values.yaml
+          sed -i "s|imageTag: .*|imageTag: ${{ needs.setup.outputs.IMAGE_TAG }}|" helm/values.yaml
 
       - name: Commit and push changes
-        working-directory: charts
+        working-directory: helm
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add .
-          git commit -m "Update migration image tag to ${{ needs.setup.outputs.IMAGE_TAG }}"
+          git commit -m "Update migration migration image tag to ${{ needs.setup.outputs.IMAGE_TAG }}"
           git push
 
   notify:
