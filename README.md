@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-%234b5563.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0)
 [![MADE BY](https://img.shields.io/badge/made%20by-teletwoboy-informational?style=flat-square)](https://github.com/teletwoboy)
-![Version](https://img.shields.io/badge/Version-0.1.0-success?style=flat-square)
+![Version](https://img.shields.io/badge/golang--migrate-v4.17.0-success?style=flat-square)
 
 </div>
 
