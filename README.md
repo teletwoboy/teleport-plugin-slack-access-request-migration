@@ -39,7 +39,7 @@ migrate -path=. -database="postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT
 
 <br>
 
-## Structure
+## Directory Structure
 ```
 ├── .github
 │   └── workflows
