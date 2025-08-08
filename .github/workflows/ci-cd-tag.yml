@@ -49,6 +49,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
+          context: .
           push: true
           tags: docker.io/springboothate/teleport-plugin-slack-access-request-migration:${{ needs.setup.outputs.IMAGE_TAG }}
 
